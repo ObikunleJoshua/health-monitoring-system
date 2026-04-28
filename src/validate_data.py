@@ -1,80 +1,64 @@
 import pandas as pd
 import sqlite3
 
-# Connect to DB
-conn = sqlite3.connect("health_monitoring.db")
+def main():
+    conn = sqlite3.connect("health_monitoring.db")
 
-# Load raw data
-df = pd.read_sql("SELECT * FROM raw_health_reports", conn)
+    df = pd.read_sql("SELECT * FROM raw_health_reports", conn)
 
-# ---------------------------
-# VALIDATION RULES
-# ---------------------------
+    validation_results = []
 
-validation_results = []
+    for _, row in df.iterrows():
+        issues = []
 
-for idx, row in df.iterrows():
-    issues = []
+        if pd.isna(row["reported_cases"]):
+            issues.append("Missing cases")
 
-    # Rule 1: Missing values
-    if pd.isna(row["reported_cases"]):
-        issues.append("Missing cases")
+        if row["reported_cases"] is not None and row["reported_cases"] < 0:
+            issues.append("Negative cases")
 
-    # Rule 2: Negative values
-    if row["reported_cases"] is not None and row["reported_cases"] < 0:
-        issues.append("Negative cases")
+        if row["reported_cases"] == 0:
+            issues.append("Zero cases")
 
-    # Rule 3: Zero cases (suspicious)
-    if row["reported_cases"] == 0:
-        issues.append("Zero cases (possible reporting issue)")
+        validation_results.append(", ".join(issues) if issues else "OK")
 
-    validation_results.append(", ".join(issues) if issues else "OK")
+    df["validation_notes"] = pd.Series(validation_results, dtype="string")
+    df["is_valid"] = df["validation_notes"] == "OK"
 
-df["validation_notes"] = validation_results
-df["is_valid"] = df["validation_notes"] == "OK"
+    # Duplicate handling (safe)
+    duplicates = df.duplicated(
+        subset=["report_date", "region", "disease"],
+        keep="first"
+    )
 
-# ---------------------------
-# DUPLICATE DETECTION
-# ---------------------------
+    df.loc[duplicates, "validation_notes"] = (
+        df.loc[duplicates, "validation_notes"].astype(str) + " | Duplicate"
+    )
 
-duplicates = df.duplicated(
-    subset=["report_date", "region", "disease"], keep=False
-)
+    df.loc[duplicates, "is_valid"] = True
 
-# FORCE column to string (critical fix)
-df["validation_notes"] = df["validation_notes"].astype(str)
+    processed_df = df[[
+        "report_id",
+        "report_date",
+        "region",
+        "disease",
+        "reported_cases",
+        "vaccinations",
+        "is_valid",
+        "validation_notes"
+    ]]
 
-# Now safe to concatenate
-df.loc[duplicates, "validation_notes"] = (
-    df.loc[duplicates, "validation_notes"] + " | Duplicate"
-)
+    processed_df.to_sql(
+        "processed_health_reports",
+        conn,
+        if_exists="replace",
+        index=False
+    )
 
-df.loc[duplicates, "is_valid"] = False
+    conn.close()
 
-# ---------------------------
-# SAVE TO PROCESSED TABLE
-# ---------------------------
+    print("Validation completed.")
 
-# Keep required columns only
-processed_df = df[[
-    "report_id",
-    "report_date",
-    "region",
-    "disease",
-    "reported_cases",
-    "vaccinations",
-    "is_valid",
-    "validation_notes"
-]]
 
-# Save
-processed_df.to_sql(
-    "processed_health_reports",
-    conn,
-    if_exists="replace",
-    index=False
-)
-
-conn.close()
-
-print("Validation completed and data saved to processed_health_reports.")
+if __name__ == "__main__":
+    main()

@@ -1,27 +1,25 @@
 import pandas as pd
 import sqlite3
 
-# Load CSV
-df = pd.read_csv("data/raw_health_data.csv")
+def main():
+    df = pd.read_csv("data/raw_health_data.csv")
 
-print("CSV rows:", len(df))  # DEBUG
+    df.rename(columns={
+        "date": "report_date",
+        "cases": "reported_cases"
+    }, inplace=True)
 
-# Rename columns to match SQL
-df.rename(columns={
-    "date": "report_date",
-    "cases": "reported_cases"
-}, inplace=True)
+    conn = sqlite3.connect("health_monitoring.db")
 
-# Connect DB
-conn = sqlite3.connect("health_monitoring.db")
+    conn.execute("DELETE FROM raw_health_reports")
 
-# CLEAR TABLE before loading (important)
-conn.execute("DELETE FROM raw_health_reports")
+    df.to_sql("raw_health_reports", conn, if_exists="append", index=False)
 
-# Insert data
-df.to_sql("raw_health_reports", conn, if_exists="append", index=False)
+    conn.commit()
+    conn.close()
 
-conn.commit()
-conn.close()
+    print("Data loaded into raw_health_reports.")
 
-print("Data loaded into raw_health_reports.")
+
+if __name__ == "__main__":
+    main()

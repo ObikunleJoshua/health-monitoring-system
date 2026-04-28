@@ -34,13 +34,14 @@ if not st.session_state["logged_in"]:
 # AUTO-SETUP DATABASE
 # ---------------------------
 import os
-import subprocess
 
 if not os.path.exists("health_monitoring.db"):
-    subprocess.run(["python", "src/generate_data.py"])
-    subprocess.run(["python", "src/load_data.py"])
-    subprocess.run(["python", "src/validate_data.py"])
-    subprocess.run(["python", "src/anomaly_detection.py"])
+    from src import generate_data, load_data, validate_data, anomaly_detection
+
+    generate_data.main()
+    load_data.main()
+    validate_data.main()
+    anomaly_detection.main()
 
 # ---------------------------
 # LOAD DATA
