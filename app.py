@@ -31,6 +31,18 @@ if not st.session_state["logged_in"]:
     st.stop()
 
 # ---------------------------
+# AUTO-SETUP DATABASE
+# ---------------------------
+import os
+import subprocess
+
+if not os.path.exists("health_monitoring.db"):
+    subprocess.run(["python", "src/generate_data.py"])
+    subprocess.run(["python", "src/load_data.py"])
+    subprocess.run(["python", "src/validate_data.py"])
+    subprocess.run(["python", "src/anomaly_detection.py"])
+
+# ---------------------------
 # LOAD DATA
 # ---------------------------
 conn = sqlite3.connect("health_monitoring.db")
@@ -97,8 +109,6 @@ filtered_df = agg_df[
 # ---------------------------
 # TREND CHART (PLOTLY)
 # ---------------------------
-import plotly.express as px
-
 st.subheader("📈 Disease Trends Over Time")
 
 trend = filtered_df.groupby("report_date")["total_cases"].sum().reset_index()
@@ -107,7 +117,7 @@ fig = px.line(
     trend,
     x="report_date",
     y="total_cases",
-    title="Total Cases Over Time",
+    title="Total Cases Over Time"
 )
 
 st.plotly_chart(fig, use_container_width=True)
