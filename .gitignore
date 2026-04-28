@@ -1,0 +1,4 @@
+health_monitoring.db
+__pycache__/
+.streamlit/
+.env
