@@ -31,18 +31,29 @@ if not st.session_state["logged_in"]:
     st.stop()
 
 # ---------------------------
-# AUTO-SETUP DATABASE
+# AUTO-SETUP DATABASE (FINAL FIX)
 # ---------------------------
-import os
+from src import generate_data, load_data, validate_data, anomaly_detection, db_setup
 
-if not os.path.exists("health_monitoring.db"):
-    from src import generate_data, load_data, validate_data, anomaly_detection, db_setup
+conn = sqlite3.connect("health_monitoring.db")
+cursor = conn.cursor()
 
-    db_setup.main()          
-    generate_data.main()    
-    load_data.main()        
-    validate_data.main()     
+# Check if aggregated_metrics table exists
+cursor.execute("""
+SELECT name FROM sqlite_master 
+WHERE type='table' AND name='aggregated_metrics';
+""")
+
+table_exists = cursor.fetchone()
+
+if not table_exists:
+    db_setup.main()
+    generate_data.main()
+    load_data.main()
+    validate_data.main()
     anomaly_detection.main()
+
+conn.close()
 
 # ---------------------------
 # LOAD DATA
