@@ -2729,8 +2729,3 @@ date,region,disease,cases,vaccinations
 2024-06-30,Central,Flu,40.0,32
 2024-06-30,Central,Malaria,74.0,108
 2024-06-30,Central,COVID,30.0,43
-2024-01-07,West,Malaria,69.0,20
-2024-01-07,West,COVID,24.0,53
-2024-01-07,Central,Flu,35.0,108
-2024-01-07,Central,Malaria,64.0,35
-2024-01-07,Central,COVID,30.0,88

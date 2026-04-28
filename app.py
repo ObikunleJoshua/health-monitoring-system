@@ -36,11 +36,12 @@ if not st.session_state["logged_in"]:
 import os
 
 if not os.path.exists("health_monitoring.db"):
-    from src import generate_data, load_data, validate_data, anomaly_detection
+    from src import generate_data, load_data, validate_data, anomaly_detection, db_setup
 
-    generate_data.main()
-    load_data.main()
-    validate_data.main()
+    db_setup.main()          
+    generate_data.main()    
+    load_data.main()        
+    validate_data.main()     
     anomaly_detection.main()
 
 # ---------------------------
