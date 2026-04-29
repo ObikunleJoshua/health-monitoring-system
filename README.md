@@ -14,7 +14,7 @@ A real-world data monitoring system that simulates a **public health data pipeli
 ## Key Features
 
 - **Data pipeline (Python + SQL)**
-- **Data Validation Engine**: — Flags missing, inconsistent, or duplicate records
+- **Data Validation Engine**: Flags missing, inconsistent, or duplicate records
 - **Anomaly Detection**: Identifies abnormal spikes in disease cases
 - **Interactive Dashboard** (Streamlit + Plotly)
 - **Business Insights & Reporting**
@@ -59,11 +59,11 @@ Data Flow:
 CSV → SQL → Validation → Aggregation → Dashboard
 
 Components:
-- **Generate Data** → Simulates public health reports  
-- **Load Data** → Stores data into SQL database  
-- **Validate Data** → Flags missing & inconsistent records  
-- **Detect Anomalies** → Identifies unusual spikes in cases  
-- **Visualize** → Displays insights via dashboard
+- **Generate Data** - Simulates public health reports  
+- **Load Data** - Stores data into SQL database  
+- **Validate Data** - Flags missing & inconsistent records  
+- **Detect Anomalies** - Identifies unusual spikes in cases  
+- **Visualize** - Displays insights via dashboard
 
 ---
 
