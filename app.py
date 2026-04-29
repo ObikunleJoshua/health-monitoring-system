@@ -72,7 +72,15 @@ agg_df["report_date"] = pd.to_datetime(agg_df["report_date"])
 # HEADER
 # ---------------------------
 st.title("🏥 Public Health Monitoring System")
-st.markdown("Monitor disease trends, anomalies, and data quality in real-time.")
+st.markdown("""
+### 📌 What This System Does
+
+This system simulates a **public health monitoring pipeline** that:
+- Tracks disease reports across regions
+- Validates incoming data for quality issues
+- Detects anomalies that may indicate outbreaks
+- Highlights high-risk areas for decision-making
+""")
 
 # ---------------------------
 # KPI SECTION
@@ -86,6 +94,28 @@ col1, col2, col3 = st.columns(3)
 col1.metric("📊 Total Cases", f"{total_cases:,}")
 col2.metric("⚠️ Anomalies Detected", total_anomalies)
 col3.metric("🧪 Data Issues", invalid_records)
+
+# ---------------------------
+# 🚨 CRITICAL ALERT PANEL
+# ---------------------------
+high_risk = agg_df[
+    (agg_df["anomaly_flag"] == 1) &
+    (agg_df["total_cases"] > agg_df["avg_7d_cases"] * 1.5)
+]
+
+if len(high_risk) > 0:
+    top_alert = high_risk.sort_values(by="total_cases", ascending=False).iloc[0]
+
+    st.error(f"""
+    🚨 **CRITICAL ALERT**
+
+    Region: {top_alert['region']}  
+    Disease: {top_alert['disease']}  
+    Cases: {int(top_alert['total_cases'])}  
+    Above Normal: {round(top_alert['total_cases'] / top_alert['avg_7d_cases'], 2)}x
+    """)
+else:
+    st.success("✅ No critical outbreaks detected")
 
 # ---------------------------
 # ALERT SYSTEM
@@ -122,15 +152,15 @@ filtered_df = agg_df[
 # ---------------------------
 # TREND CHART (PLOTLY)
 # ---------------------------
-st.subheader("📈 Disease Trends Over Time")
+st.subheader("📊 Cases vs 7-Day Average")
 
-trend = filtered_df.groupby("report_date")["total_cases"].sum().reset_index()
+comparison = filtered_df.groupby("report_date")[["total_cases", "avg_7d_cases"]].sum().reset_index()
 
 fig = px.line(
-    trend,
+    comparison,
     x="report_date",
-    y="total_cases",
-    title="Total Cases Over Time"
+    y=["total_cases", "avg_7d_cases"],
+    title="Actual Cases vs Expected Trend"
 )
 
 st.plotly_chart(fig, use_container_width=True)
@@ -148,6 +178,24 @@ else:
     st.info("No anomalies detected.")
 
 # ---------------------------
+# 🎯 RISK SCORING
+# ---------------------------
+st.subheader("🎯 High Risk Regions")
+
+risk_df = agg_df.copy()
+
+risk_df["risk_score"] = (
+    (risk_df["anomaly_flag"] * 2) +
+    (risk_df["total_cases"] / (risk_df["avg_7d_cases"] + 1))
+)
+
+top_risk = risk_df.sort_values(by="risk_score", ascending=False).head(10)
+
+st.dataframe(top_risk[[
+    "region", "disease", "total_cases", "avg_7d_cases", "risk_score"
+]])
+
+# ---------------------------
 # DATA QUALITY ISSUES
 # ---------------------------
 st.subheader("🧪 Data Quality Issues")
@@ -160,6 +208,8 @@ st.dataframe(issues.head(20))
 # INSIGHT ENGINE
 # ---------------------------
 st.subheader("🧠 Automated Insights")
+
+trend = filtered_df.groupby("report_date")["total_cases"].sum().reset_index()
 
 if len(trend) > 1:
     latest = trend.iloc[-1]["total_cases"]

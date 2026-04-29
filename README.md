@@ -33,6 +33,26 @@ Designed for health officers to monitor:
 
 ---
 
+## Dashboard Preview
+
+![Dashboard](images/dashboard.png)
+![Dashboard](images/plotly.png)
+![Dashboard](images/risk.png)
+
+---
+## System Architecture
+
+Data Flow:
+CSV → SQL → Validation → Aggregation → Dashboard
+
+Components:
+- Data Generator (synthetic health data)
+- Validation Engine (data quality checks)
+- Anomaly Detection (trend deviation)
+- Dashboard (Streamlit + Plotly)
+
+---
+
 ## Run Locally
 
 ```bash
