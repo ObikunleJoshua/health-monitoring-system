@@ -1,17 +1,38 @@
 # 🏥 Public Health Monitoring System
 
-A data monitoring system that simulates real-world public health pipelines, including data ingestion, validation, anomaly detection, and dashboard visualization.
+A real-world data monitoring system that simulates a **public health data pipeline**, designed to detect anomalies, validate incoming data, and support decision-making through an interactive dashboard.
 
 ---
 
-## Features
+## Dashboard Preview
 
-- Data pipeline (Python + SQL)
-- Data validation engine
-- Anomaly detection system
-- Interactive dashboard (Streamlit + Plotly)
-- Authentication system
-- Business insights & reporting
+![Dashboard](images/dashboard.png)
+![Dashboard](images/plotly.png)
+![Dashboard](images/risk.png)
+---
+
+## Key Features
+
+- **Data pipeline (Python + SQL)**
+- **Data Validation Engine**: — Flags missing, inconsistent, or duplicate records
+- **Anomaly Detection**: Identifies abnormal spikes in disease cases
+- **Interactive Dashboard** (Streamlit + Plotly)
+- **Business Insights & Reporting**
+- **Risk Scoring System**: Highlights high-risk regions and diseases
+- **Trend Monitoring**: Compares actual vs expected case patterns  
+- **Authentication Layer**: Secures dashboard access  
+- **Downloadable Reports**: Export anomaly data for analysis 
+
+---
+
+## 💡 Business Impact
+
+This system helps **detect potential disease outbreaks early** by identifying unusual patterns in health data.
+
+It enables:
+- Faster response to abnormal case spikes  
+- Better prioritization of high-risk regions  
+- Improved data quality monitoring  
 
 ---
 
@@ -26,18 +47,10 @@ Designed for health officers to monitor:
 
 ## Tech Stack
 
-- Python (Pandas, NumPy)
-- SQLite
-- Streamlit
-- Plotly
-
----
-
-## Dashboard Preview
-
-![Dashboard](images/dashboard.png)
-![Dashboard](images/plotly.png)
-![Dashboard](images/risk.png)
+- **Python** (Pandas, NumPy)
+- **SQL** (SQLite)
+- **Streamlit** (Dashboard UI)
+- **Plotly** (Interactive Visualizations)
 
 ---
 ## System Architecture
@@ -46,10 +59,11 @@ Data Flow:
 CSV → SQL → Validation → Aggregation → Dashboard
 
 Components:
-- Data Generator (synthetic health data)
-- Validation Engine (data quality checks)
-- Anomaly Detection (trend deviation)
-- Dashboard (Streamlit + Plotly)
+- **Generate Data** → Simulates public health reports  
+- **Load Data** → Stores data into SQL database  
+- **Validate Data** → Flags missing & inconsistent records  
+- **Detect Anomalies** → Identifies unusual spikes in cases  
+- **Visualize** → Displays insights via dashboard
 
 ---
 
@@ -61,4 +75,5 @@ python src/generate_data.py
 python src/load_data.py
 python src/validate_data.py
 python src/anomaly_detection.py
+
 python -m streamlit run app.py
